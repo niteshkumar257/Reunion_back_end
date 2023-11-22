@@ -18,7 +18,7 @@ const Login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, isAdmin: user.isAdmin },
+      { userId: user._id, isOwner: user.isOwner },
       process.env.JWT_SCERECT,
       {
         expiresIn: "1h",
@@ -38,7 +38,7 @@ const Register = async (req, res) => {
 
     const userExit = await User.findOne({ email });
 
-    console.log(userExit);
+   
     if (!userExit) {
       const user = new User({ email, password ,isOwner:isOwner || false });
 

@@ -18,9 +18,12 @@ const userVerification = async (req, res, next) => {
         process.env.JWT_SCERECT,
         (err, decode) => {
           if (err) {
-            res.status(401).json({ message: "Authorized user" });
-          }
+            res.status(401).json({ message: " unAuthorized user" });
+          } else 
+          {
           const isOwner = decode.isOwner;
+
+          console.log(isOwner,decode);
 
           // the req object with decode value
           req.user = decode;
@@ -30,7 +33,9 @@ const userVerification = async (req, res, next) => {
             res
               .status(401)
               .json({ message: "You are not authorized to do this" });
-          next();
+        
+          }
+         next();
         }
       );
     }

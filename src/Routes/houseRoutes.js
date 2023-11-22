@@ -7,6 +7,6 @@ router.get('/getAllhouses',getHouse);
 router.get('/getOwnhouses/:user_id',userVerification,getOwnHouse);
 router.post('/addHouse',userVerification,addHouse)
 router.delete('/deleteHouse/:house_id',userVerification,deleteHouse);
-router.put('/updateHouse/:house_id',userVerification,updateHouse);
+router.patch('/updateHouse/:house_id',userVerification,updateHouse);
 
 export default router;

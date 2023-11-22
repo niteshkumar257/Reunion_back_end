@@ -1,5 +1,5 @@
-
 import { House } from "../Models/house.models.js";
+import mongoose from "mongoose";
 
 const addHouse = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ const addHouse = async (req, res) => {
       category,
     } = req.body;
 
-    console.log(houseName,price,ownBy,image,feature,address,availableDate,category);
+    
 
     const newHouse = new House({
       houseName,
@@ -28,7 +28,7 @@ const addHouse = async (req, res) => {
     });
 
     const savedHouse = await newHouse.save();
-    res.json({"message":"new house create","houseDetails":savedHouse});
+    res.json({ message: "new house create", houseDetails: savedHouse });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -36,71 +36,74 @@ const addHouse = async (req, res) => {
 
 const getHouse = async (req, res) => {
   try {
-
-    const {city,category}=req.query;
+    const { city, category } = req.query;
     const query = {};
     if (city) {
-      query['address.city'] = city;
+      query["address.city"] = city;
     }
     if (category) {
-      query['category'] = category;
+      query["category"] = category;
     }
 
     let houses;
     console.log(query);
-    if(query)
-    {
-      houses=await House.find(query);
-      
+    if (query) {
+      houses = await House.find(query);
+    } else {
+      houses = await House.find();
     }
-    else 
-    {
- houses = await House.find();
-    }
-    
-    
-    res.json({"allhouses":houses});
+
+    res.json({ allhouses: houses });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const getOwnHouse=async(req,res)=>{
-    try{
-        const {city,category}=req.query;
-        const {user_id}=req.params;
-        const query={};
-        if(city)
-        {
-            query['address.city']=city
-        }
-        if(category)
-        {
-            query['catergory']=category
-        }
-        if(user_id)
-        {
-            query['ownBy']=user_id
-        }
-        
-        const allhouses=await House.find(query);
-        res.json({'allhouses':allhouses});
-
-
-    }catch(error){
-
-       res.json({error:error.message});
+const getOwnHouse = async (req, res) => {
+  try {
+    const { city, category } = req.query;
+    const { user_id } = req.params;
+    const query = {};
+    if (city) {
+      query["address.city"] = city;
     }
-}
+    if (category) {
+      query["catergory"] = category;
+    }
+    if (user_id) {
+      query["ownBy"] = user_id;
+    }
+
+    const allhouses = await House.find(query);
+    res.json({ allhouses: allhouses });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
 const updateHouse = async (req, res) => {
+ 
+ 
   try {
     const { house_id } = req.params;
-    const updatedHouse = await House.findByIdAndUpdate(
-      house_id,
-      { $set: req.body },
-      { new: true }
-    );
-    res.json({"message":"house details updated","updatedHouse":updatedHouse});
+    let { userId } = req.user;
+    const updateFields={$set:req.body}
+    const house = await House.findOne({ _id: house_id });
+    const houseOwnerId = new mongoose.Types.ObjectId(house.ownBy);
+    userId = new mongoose.Types.ObjectId(userId);
+    const isOwner = houseOwnerId.equals(userId);
+    if (!house) res.status(404).json({ message: "No house exits" });
+    else if (isOwner) {
+      const updatedHouse = await House.findOneAndUpdate(
+        { _id:house_id, ownBy:userId }, 
+        updateFields,
+        { new: true }
+      );
+      res.status(200).json({ "updatedHouse":updatedHouse });
+    } else {
+      res
+        .status(403)
+        .json({ message: "You are not allowed Update house Details" });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -109,11 +112,32 @@ const updateHouse = async (req, res) => {
 const deleteHouse = async (req, res) => {
   try {
     const { house_id } = req.params;
-    const deletedHouse = await House.findByIdAndDelete(house_id);
-    res.json(deletedHouse);
+    const {userId}=req.user;
+    const house=await House.findOne({_id:house_id});
+    // house does not exits then return 
+    if(!house) res.status(400).json({message:"House doesnot exits"});
+    else 
+    {
+      // house exits
+
+    const houseOwenerId=new mongoose.Types.ObjectId(house.ownBy);
+    const ownerId=new mongoose.Types.ObjectId(userId);
+    const isOwnhouse=houseOwenerId.equals(ownerId);
+   
+    if(isOwnhouse)
+    {
+      const deletedHouse = await House.findByIdAndDelete(house_id);
+      res.status(200).json({"message":"house delted succefully"});
+    }
+    else 
+    {
+      res.json({"message":"It is not your house"})
+    }
+  }
+    
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-export { addHouse, getHouse, updateHouse, deleteHouse ,getOwnHouse};
+export { addHouse, getHouse, updateHouse, deleteHouse, getOwnHouse };
