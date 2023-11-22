@@ -1,6 +1,40 @@
 import mongoose from "mongoose";
 
 const houseCategories = ['Apartment', 'House', 'Condo'];
+
+const featureSchema = new mongoose.Schema({
+  noBedroom: {
+    type: Number,
+    required: true,
+  },
+  noBathroom: {
+    type: Number,
+    required: true,
+  },
+  length: {
+    type: Number,
+    required: true,
+  },
+  width: {
+    type: Number,
+    required: true,
+  },
+});
+
+const addressSchema = new mongoose.Schema({
+  placeName: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  country: {
+    type: String,
+    required: true,
+  },
+});
 const houseSchema=new mongoose.Schema({
       houseName:{
         type:String,
@@ -19,15 +53,10 @@ const houseSchema=new mongoose.Schema({
         type:String,
         required:true,
       },
-      Feature:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Feature"
-      },
-      Address:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Address"
-      },
-      AvailableDate:{
+     
+      feature: featureSchema, 
+      address: addressSchema,
+      availableDate:{
         type:Date,
         required:true
       },
