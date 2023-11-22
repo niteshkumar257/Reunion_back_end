@@ -34,13 +34,13 @@ const Login = async (req, res) => {
 // Register User
 const Register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, isOwner } = req.body;
 
     const userExit = await User.findOne({ email });
 
     console.log(userExit);
     if (!userExit) {
-      const user = new User({ email, password });
+      const user = new User({ email, password ,isOwner:isOwner || false });
 
       await user.save();
 
