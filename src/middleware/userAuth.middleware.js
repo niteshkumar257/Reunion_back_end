@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 const userVerification = async (req, res, next) => {
   try {
+   
     if (!req.headers.authorization)
       res.status(404).json({ message: "Please send the authorization header" });
     else {
@@ -8,6 +9,7 @@ const userVerification = async (req, res, next) => {
         req.headers.authorization || req.headers.Authorization;
       authorizationHeader = authorizationHeader.split(" ")[1];
 
+     
       // check if the authorization header is exit or not
       if (!authorizationHeader)
         res.status(404).json({ message: "No token found" });
@@ -23,13 +25,13 @@ const userVerification = async (req, res, next) => {
           {
           const isOwner = decode.isOwner;
 
-          console.log(isOwner,decode);
+          
 
           // the req object with decode value
           req.user = decode;
 
           // check is the user is owner or not
-          if (!isOwner)
+          if (isOwner)
             res
               .status(401)
               .json({ message: "You are not authorized to do this" });

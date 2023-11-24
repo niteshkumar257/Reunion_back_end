@@ -9,12 +9,12 @@ const Login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ error: "Authentication failed" });
+      return res.status(401).json({ error: "No User exits" });
     }
 
     const isPasswordValid = user.password === password;
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Authentication failed" });
+      return res.status(401).json({ error: "Incorrect Password" });
     }
 
     const token = jwt.sign(
