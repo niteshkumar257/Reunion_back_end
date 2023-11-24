@@ -11,7 +11,7 @@ dotenv.config({
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: ["http://localhost:3000","https://reunionfrontend.onrender.com/"],
+  origin: ["http://localhost:3000","https://reunionfrontend.onrender.com"],
   optionsSuccessStatus: 200,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 }));
