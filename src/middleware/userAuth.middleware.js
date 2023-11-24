@@ -1,41 +1,39 @@
 import jwt from "jsonwebtoken";
+
 const userVerification = async (req, res, next) => {
   try {
-    if (!req.headers.Authorization || !req.headers.authorization)
-      res.status(404).json({ message: "Please send the authorization header" });
-    else {
-      let authorizationHeader =
-        req.headers.authorization || req.headers.Authorization;
-      authorizationHeader = authorizationHeader.split(" ")[1];
+    if (!req.headers.authorization)
+      return res.status(404).json({ message: "Please send the authorization header" });
 
-      // check if the authorization header is exit or not
-      if (!authorizationHeader)
-        res.status(404).json({ message: "No token found" });
+    const authorizationHeader = req.headers.authorization.split(" ")[1];
 
-      // if token exits then check the validatiy of the token
-      jwt.verify(
-        authorizationHeader,
-        process.env.JWT_SCERECT,
-        (err, decode) => {
-          if (err) {
-            res.status(401).json({ message: " unAuthorized user" });
-          } else {
-            const isOwner = decode.isOwner;
+    if (!authorizationHeader)
+      return res.status(404).json({ message: "No token found" });
 
-            // the req object with decode value
-            req.user = decode;
-
-            // check is the user is owner or not
-            if (isOwner)
-              res
-                .status(401)
-                .json({ message: "You are not authorized to do this" });
-          }
-          next();
+    jwt.verify(
+      authorizationHeader,
+      process.env.JWT_SCERECT,
+      (err, decode) => {
+        if (err) {
+          return res.status(401).json({ message: "Unauthorized user" });
         }
-      );
-    }
+
+        const isOwner = decode.isOwner;
+
+        // the req object with decode value
+        req.user = decode;
+
+        // check if the user is an owner or not
+        if (isOwner) {
+          return res.status(401).json({ message: "You are not authorized to do this" });
+        }
+
+        // If everything is fine, move to the next middleware
+        next();
+      }
+    );
   } catch (err) {
+    // Handle unexpected errors and send a 500 response
     res.status(500).json({ error: err.message });
   }
 };
