@@ -34,30 +34,37 @@ const addHouse = async (req, res) => {
 
 const getHouse = async (req, res) => {
   try {
-    const { city, category, maxPrice, minPrice } = req.query;
+    const {name, city, category, maxPrice, minPrice, date,time } = req.query;
+    console.log(category);
 
     const query = {};
+
     if (city) {
       query["address.city"] = city;
     }
-    // if (category) {
-    //   query["category"] = category;
-    // }
 
-    if (minPrice && maxPrice) {
-      query.price = { $gte: minPrice, $lte: maxPrice };
-    } else if (minPrice) {
-      query.price = { $gte: minPrice };
-    } else if (maxPrice) {
-      query.price = { $lte: maxPrice };
+    if (category) {
+      query["category"] = category;
     }
 
+    if (minPrice !== undefined && maxPrice !== undefined) {
+      query["price"] = { $gte: minPrice, $lte: maxPrice };
+    }
+
+    if (date) {
+      query["availableDate"] = { $lt: date };
+    }
+
+    console.log("query", query);
+    
     const allhouses = await House.find(query);
+  
     res.json({ allhouses: allhouses });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const getOwnHouse = async (req, res) => {
   try {
@@ -86,7 +93,7 @@ const getOwnHouse = async (req, res) => {
       query.price = { $lte: maxPrice };
     }
 
-  
+  console.log(query);
 
     const allhouses = await House.find(query);
     res.json({ allhouses: allhouses });
@@ -147,4 +154,30 @@ const deleteHouse = async (req, res) => {
   }
 };
 
-export { addHouse, getHouse, updateHouse, deleteHouse, getOwnHouse };
+const updateImage=async(req,res)=>{
+  const {house_id}=req.params;
+
+  try{
+
+    // fetch house with the house_id
+    const house=House.findOne({_id:house_id});
+    if(!house)
+    {
+      return res.status(404).json({message:"No house exits"});
+    }
+    else 
+    {
+      // update the house Image
+
+    }
+
+    
+
+  }catch{
+
+    return res.status(500).json({error:"Something went wrong"});
+
+  }
+
+}
+export { addHouse, getHouse, updateHouse, deleteHouse, getOwnHouse ,updateImage};

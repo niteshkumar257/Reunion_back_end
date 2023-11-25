@@ -40,7 +40,7 @@ const Register = async (req, res) => {
 
    
     if (!userExit) {
-      const user = new User({ email, password ,isOwner:isOwner || false });
+      const user = new User({ email, password});
 
       await user.save();
 

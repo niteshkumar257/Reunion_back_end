@@ -13,8 +13,7 @@ const userSchema=new mongoose.Schema({
      },
      isOwner:{
       type:Boolean,
-      
-      default:false,
+      default:true,
      }
 })
 export const  User=mongoose.model('User',userSchema);

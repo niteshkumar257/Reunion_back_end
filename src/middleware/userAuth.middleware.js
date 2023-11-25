@@ -10,11 +10,13 @@ const userVerification = async (req, res, next) => {
     if (!authorizationHeader)
       return res.status(404).json({ message: "No token found" });
 
+
     jwt.verify(
       authorizationHeader,
       process.env.JWT_SCERECT,
       (err, decode) => {
         if (err) {
+          console.log(err);
           return res.status(401).json({ message: "Unauthorized user" });
         }
 
@@ -23,9 +25,10 @@ const userVerification = async (req, res, next) => {
         // the req object with decode value
         req.user = decode;
 
+      console.log(isOwner);
         // check if the user is an owner or not
-        if (isOwner) {
-          return res.status(401).json({ message: "You are not authorized to do this" });
+        if (!isOwner) {
+          return res.status(401).json({ message: "You are not authorized to do this action" });
         }
 
         // If everything is fine, move to the next middleware
