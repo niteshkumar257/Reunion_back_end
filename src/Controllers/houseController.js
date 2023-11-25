@@ -93,7 +93,7 @@ const getOwnHouse = async (req, res) => {
       query.price = { $lte: maxPrice };
     }
 
-  console.log(query);
+  console.log(query)
 
     const allhouses = await House.find(query);
     res.json({ allhouses: allhouses });
